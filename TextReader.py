@@ -4,16 +4,20 @@ import pyttsx3
 from tkinter import *
 from tkinter import filedialog as fd
 import speech_recognition as sr
-import keyboard
 
 #NUMBER IN FORM OF WORD TO NUMBER IN FORM OF TEXT:
 def text2int(textnum, numwords={}):
+
+    fixedtextnum = ''
+
+    for value in textnum:
+        if value == ' ':
+            pass
+        else:
+            fixedtextnum = fixedtextnum+value
+
     if not numwords:
-      units = [
-        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
-        "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
-        "sixteen", "seventeen", "eighteen", "nineteen",
-      ]
+      units = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight","nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen","sixteen", "seventeen", "eighteen", "nineteen"]
 
       tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
 
@@ -25,9 +29,9 @@ def text2int(textnum, numwords={}):
       for idx, word in enumerate(scales):   numwords[word] = (10 ** (idx * 3 or 2), 0)
 
     current = result = 0
-    for word in textnum.split():
+    for word in fixedtextnum.split():
         if word not in numwords:
-          raise Exception("Illegal word: " + word)
+          raise Exception("Error: " + word)
 
         scale, increment = numwords[word]
         current = current * scale + increment
@@ -37,12 +41,12 @@ def text2int(textnum, numwords={}):
 
     return result + current
 
-# Initialize text-to-speech engine
+# INITIALIZE TEXT TO SPEECH
 TextToSpeech = pyttsx3.init()
 TextToSpeech.setProperty("rate", 160)  # Slows down the speed of the reader
 
-# Open file dialog to select PDF
-TextToSpeech.say("Welcome to text dictator!")
+# OPEN FILE DIALOG TO SLECT PDF FILE
+TextToSpeech.say("Welcome to TeachAssist-AI.")
 TextToSpeech.runAndWait()
 TextToSpeech.say("Select PDF")
 TextToSpeech.runAndWait()
@@ -54,14 +58,13 @@ file_path = fd.askopenfilename(
     filetypes=(("PDF files", "*.pdf"),)
     )
 
-
-# Read the PDF file
+# READ THE FILE
 reader = PdfReader(file_path)
 
-# Initialize speech recognizer
+# INTIALIZE THE SPEECH RECOGNISER
 r = sr.Recognizer()
 
-# Variable initialization
+# VARIABLES
 stop = False
 dictionary = {}
 i = 0
@@ -69,14 +72,14 @@ reread = ''
 text = ''
 lines = ''
 
-# Signal handler to stop the code
+# SIGNAL HANDLER TO STOP THE CODE
 def stopTheCode(signal, frame):
     global stop
     stop = True
 
 signal.signal(signal.SIGINT, stopTheCode)
 
-# Function to repeat lines
+# FUNCTION TO REPEAT LINES
 def repeat():
     global reread
     global stoploop
@@ -127,8 +130,6 @@ def repeat():
 
                             elif readon == "no":
                                 print("You said, no")
-                                TextToSpeech.say("Ok")
-                                TextToSpeech.runAndWait()
 
                             else:
                                 print("You said, " + readon)
@@ -140,10 +141,10 @@ def repeat():
                             TextToSpeech.runAndWait()
 
         except sr.UnknownValueError:
-            TextToSpeech.say("Sorry, can you please repeat")
+            TextToSpeech.say("Sorry, didn't get that")
             TextToSpeech.runAndWait()
 
-# Main loop
+# MAIN LOOP
 global readpages
 readpages = True
 while readpages:
@@ -171,7 +172,7 @@ while readpages:
                     break
 
                 else:
-                    if heard.lower() in ['tu', 'do']:
+                    if heard in ['tu', 'do']:
                         heard = 2
                         print('You said:', heard)
                     elif heard in ['free', 'tree']:
@@ -184,7 +185,7 @@ while readpages:
                         except:
                             heard = text2int(heard)
                             print('You said:', heard)
-                            
+
                     page_num = int(heard) - 1
                     if 0 <= page_num < len(reader.pages):
                         page = reader.pages[page_num]
@@ -198,7 +199,7 @@ while readpages:
                         gotpage = 'notgot'
 
             except sr.UnknownValueError:
-                TextToSpeech.say("Sorry, can you please repeat")
+                TextToSpeech.say("Sorry, didn't get that")
                 TextToSpeech.runAndWait()
 
 
@@ -270,6 +271,7 @@ while readpages:
                 repet = r.recognize_google(audio).lower()
                 if repet == "yes":
                     print("You said, " + repet)
+                    lines = text.split(".")
                     for num in lines:
                         i += 1
                         dictionary[i] = num
@@ -278,8 +280,6 @@ while readpages:
 
                 elif repet == "no":
                     print("You said, " + repet)
-                    TextToSpeech.say("Ok")
-                    TextToSpeech.runAndWait()
 
                 else:
                     print("You said, " + repet)
@@ -287,14 +287,14 @@ while readpages:
                     TextToSpeech.runAndWait()
 
             except sr.UnknownValueError:
-                TextToSpeech.say("Sorry, can you please repeat")
+                TextToSpeech.say("Sorry, didn't get that")
                 TextToSpeech.runAndWait()
 
         except sr.UnknownValueError:
-            TextToSpeech.say("Sorry, can you please repeat")
+            TextToSpeech.say("Sorry, didn't get that")
             TextToSpeech.runAndWait()
     TextToSpeech.say("Ok")
     TextToSpeech.runAndWait()
 
-TextToSpeech.say("No Problem. Thank You for using Text Dictator")
+TextToSpeech.say("No Problem. Thank You for using TeachAssist-AI.")
 TextToSpeech.runAndWait()
